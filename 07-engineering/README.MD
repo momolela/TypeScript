@@ -108,6 +108,66 @@ ts-node // 该组件可以直接运行 ts 文件，不用先编译，这个用�
 
 > ts 的工程化 - 命名空间
 
+- 以前要防止全局变量污染的方式有：
+
+  - {}
+  - (function(){ })() 立即执行函数
+  - 闭包
+  - global 全局对象命名空间
+  - function
+  - let
+  - 模块化 - 导出、导入
+
+- 现在可以使用 ts 的 namespace
+
+  ```javascript
+  // 命名空间可以导出
+  export namespace One {
+
+     // 可以定义子命名空间
+     export namespace OneChild {
+        export function add(n: number): number {
+              return ++n;
+        }
+
+        export const name: string = 'this is namespace OneChild ----------';
+     }
+
+     // 命名空间的方法可以导出
+     export function add(n: number, m: number): number {
+        return n + m;
+     }
+
+     // 命名空间的变量也可以导出
+     export const name: string = 'this is namespace One ---------------';
+  }
+
+  export namespace Two {
+     export function add(n: string, m: string): string {
+        return n + m;
+     }
+     export const name: string = 'this is namespace Two ---------------';
+  }
+  ```
+
+  ```javascript
+  // 命名空间的调用
+  console.log(One.name);
+  console.log(One.add(1, 1));
+  console.log("-------------------------------------");
+  console.log(One.OneChild.name);
+  console.log(One.OneChild.add(1));
+  console.log("-------------------------------------");
+  console.log(Two.name);
+  console.log(Two.add("1", "1"));
+  console.log("-------------------------------------");
+  ```
+
 > ts 的工程化 - 描述声明文件
+
+- TypeScript 作为 JavaScript 的超集，在开发过程中不可避免要引用其他第三方的 JavaScript 的库。虽然通过直接引用可以调用库的类和方法，但是却无法使用 TypeScript 诸如类型检查等特性功能。
+- 为了解决这个问题，需要将这些库里的函数和方法体去掉后 **只保留导出类型声明**，而产生了一个描述 JavaScript 库和模块信息的声明文件( **.d.ts** )。
+- 通过引用这个声明文件，就可以借用 TypeScript 的各种特性来使用库文件了。
+
 
 > ts 的工程化 - 使用第三方 JavaScript 库
