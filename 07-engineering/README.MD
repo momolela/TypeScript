@@ -168,6 +168,113 @@ ts-node // 该组件可以直接运行 ts 文件，不用先编译，这个用�
 - TypeScript 作为 JavaScript 的超集，在开发过程中不可避免要引用其他第三方的 JavaScript 的库。虽然通过直接引用可以调用库的类和方法，但是却无法使用 TypeScript 诸如类型检查等特性功能。
 - 为了解决这个问题，需要将这些库里的函数和方法体去掉后 **只保留导出类型声明**，而产生了一个描述 JavaScript 库和模块信息的声明文件( **.d.ts** )。
 - 通过引用这个声明文件，就可以借用 TypeScript 的各种特性来使用库文件了。
+- 使用 d.ts 文件[可以自定义]来解决此问题
+- [微软提供的 TypeScript 官方的 d.ts](https://github.com/microsoft/TypeScript/tree/main/lib)
 
+- 如下是使用的步骤
+
+1. 自定义一个要使用的 js 文件
+   ```javascript
+   let sun_host = "sunzj";
+   const sun_hello = "HELLO";
+   function sun_shop(n, m) {
+     return n + m;
+   }
+   ```
+2. 在项目任意位置定义一个 .d.ts 文件
+
+   ```javascript
+   // 声明变量
+   declare let sun_host: string;
+   // 声明常量
+   declare const sun_hello: string;
+   // 声明函数
+   declare function sun_shop(n: number, m: numbrer): number;
+   // 声明类
+   declare class Person {
+      name: string;
+      age: number;
+      constructor(name: string, age: number): void;
+   }
+   // 声明命名空间
+   declare namespace space {
+      function func(str: string): string; let num: number;
+   }
+   // 声明模块
+   declare module "modelname" {
+      export let a: number
+      export function b(): number
+      export namespace c {
+         let cd: string
+      }
+   }
+   ```
+
+3. 在 ts 文件中使用声明描述文件中的东西，会有类型提示
+
+   ```javascript
+   function fun(n: number, m: number): number {
+      return n + m;
+   }
+   fun(1, 1); // 调用的时候有类型提示
+
+   // 调用的时候有类型调用
+   const box: HTMLDivElement = document.querySelector('.box') as HTMLDivElement;
+
+
+   export function useDeclare() {
+      // 引入自定义的 js 文件，这里直接访问 js 中定义的变量也会有类型提示，且能编译通过，因为有 d.ts 文件作为描述文件进行声明
+      console.log(sun_host);
+      console.log(sun_hello);
+      console.log(sun_shop(1, 1));
+
+      const p = new Person('sun', 5);
+      console.log(p.name);
+   }
+   ```
 
 > ts 的工程化 - 使用第三方 JavaScript 库
+
+- 我们引入第三方的 JavaScript 库，要使用他的 api
+
+  - 要么它本身带了 d.ts 描述文件
+  - 要么需要我们去给他定义出来我们需要使用的 api 的 d.ts 文件
+
+    ```javascript
+    // axios 模块自带 d.ts 文件，所以我们调用它的 get 方法，可以直接调用不会报错
+    import axios from "axios";
+    axios.get("https: //api.shop.eduwork.cn/api/index").then((res) => {
+      console.log(res);
+    });
+    ```
+
+    ```javascript
+    // loadsh 模块没有自带 d.ts 文件，需要我们自己创建描述文件，然后声明使用，调用才不会报错
+    import lodash from "lodash";
+    console.log(lodash.join(["edu", "work "]));
+
+    // d.ts 文件中的配置
+    declare module 'lodash' {
+      export function join(any[]):void;
+    }
+    ```
+
+  - 要么是用大神写好的 d.ts 文件
+
+    - [这是所有提供 d.ts 的链接](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types)
+    - [这是对提供 d.ts 进行搜索的链接，有 @types 的就是带有 d.ts 文件的](https://www.typescriptlang.org/dt/search?search=)
+
+  - 如：在 ts 中使用 jquery
+
+    ```text
+    npm install jquery
+
+    npm install --save-dev @types/jquery
+
+    npm install typings
+
+       -安装typing，用于获取jquery的d.ts文件，这步过后你的根目录会多一个typings.json文件。
+
+    import $ = require("jquery");
+    这样$符号就可以想在JavaScript中引入jquery一样作为选择器使用
+    ```

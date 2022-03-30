@@ -1,6 +1,7 @@
 import { sub } from './global'
 import { One, Two } from './namespace'
 import { useDeclare } from './customDeclare'
+import { useOtherCore } from './useOtherCore'
 
 function add(n: number, m: number): number {
     return n + m;
@@ -22,4 +23,7 @@ console.log('-------------------------------------');
 
 
 // 自定义声明调用
-useDeclare();
+// useDeclare(); // 这个暂时会报错，因为 custom.js 没有打包到 build 里面
+
+// 第三方库的使用
+useOtherCore();
